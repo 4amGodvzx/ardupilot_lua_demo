@@ -1,16 +1,22 @@
 local function target_location() --标靶信息传入模块(待定)
-    itargetloc = {0,0,0} --target_location{纬度,经度,海拔}(要确定海拔的参考系)
+    itargetloc = {-35.3563182,149.1677581,0} --target_location{纬度,经度,海拔}(要确定海拔的参考系)
     return true
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行(待定)
     return true
 end
-local function unit_conversion(pos1,pos2) --经纬度换算
-    local upos1 = {math.rad(pos1[1]/1e7),math.rad(pos1[2]/1e7)}
-    local upos2 = {math.rad(pos2[1]/1e7),math.rad(pos2[2]/1e7)}
-    local r = 6371393 --地球半径
-    local udistance = r * math.acos(math.sin(upos1[1]) * math.sin(upos2[1]) + math.cos(upos1[1]) * math.cos(upos2[1]) * math.cos(upos1[2] - upos2[2])) --换算公式
-    return udistance
+function haversineDistance(a, b) --经纬度换算
+    local earthRadius = 6371000 -- 地球半径
+    local lat1Rad = a.x * math.pi / 180
+    local lat2Rad = b.x * math.pi / 180
+    local diffLat = (b.x - a.x) * math.pi / 180
+    local diffLon = (b.y - a.y) * math.pi / 180
+    local a = math.sin(diffLat / 2) * math.sin(diffLat / 2) +
+              math.cos(lat1Rad) * math.cos(lat2Rad) *
+              math.sin(diffLon / 2) * math.sin(diffLon / 2)
+    local c = 2 * math.atan(math.sqrt(a), math.sqrt(1 - a))
+    local distance = earthRadius * c
+    return distance
 end
 local function dropping_calculation() --投弹计算
     local loc = ahrs:get_position() --(获取位置与速度信息有AHRS和GPS两种方案)
@@ -18,11 +24,11 @@ local function dropping_calculation() --投弹计算
     if loc == nil or velocity_vec == nil then
         return false
     end
-    local distance = unit_conversion({loc:lat(),loc:lng()},{itargetloc[1],itargetloc[2]})
+    local distance = haversineDistance({x = loc:lat(),y = loc:lng()},{x = itargetloc[1],y = itargetloc[2]})
     local relative_height = (loc:alt() - itargetloc[3])/100
     local velocity = velocity_vec:length()
     local displacement
-    local g = 9.8
+    local g = 9.7997 --河北石家庄
     local remaining_distance
     displacement = velocity * math.sqrt(2 * relative_height / g) --使用理想状态下的平抛运动计算
     remaining_distance = distance - displacement
