@@ -36,13 +36,14 @@ local function haversineDistance(a, b) --Haversine经纬度换算法
     return distance
 end
 local function dropping_calculation() --投弹计算
-    local loc = ahrs:get_position() --(获取位置与速度信息有AHRS和GPS两种方案)
-    local velocity_vec = ahrs:groundspeed_vector()
+    local pri_sensor = gps:primary_sensor()
+    local loc = gps:location(pri_sensor) --(GPS获取位置与速度信息)
+    local velocity_vec = gps:velocity(pri_sensor)
     if loc == nil or velocity_vec == nil then
         return false
     end
     local distance = haversineDistance({x = loc:lat() / 1e7,y = loc:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]})
-    local relative_height = (loc:alt() - itargetloc[3])/100
+    local relative_height = loc:alt() / 100 - itargetloc[3]
     local velocity = error_correction(velocity_vec:length())
     local displacement
     local g = 9.7997 --河北石家庄重力加速度
@@ -57,6 +58,9 @@ local function dropping_calculation() --投弹计算
     end
 end
 local function servo_output() --控制舵机函数
+    local servo_output_function = 0
+	SRV_Channels:set_output_pwm(servo_output_function, 2200)
+	gcs:send_text(6, "channel5 output.")
     return true
 end
 local target_get = false --记录是否收到标靶坐标
@@ -78,7 +82,7 @@ function update()
             local time_to_drop = false
             time_to_drop = dropping_calculation()
             if time_to_drop == true then
-                servo_output() --控制舵机执行投弹操作(待定)
+                servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)
                 param:set_and_save("WAYPIONT_CHANGE",0)

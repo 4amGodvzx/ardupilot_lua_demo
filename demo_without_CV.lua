@@ -50,9 +50,6 @@ local function dropping_calculation() --投弹计算
     end
 end
 local function servo_output() --控制舵机函数
-    local servo_output_function = 0
-	SRV_Channels:set_output_pwm(servo_output_function, 2200)
-	gcs:send_text(6, "channel5 output.")
     return true
 end
 local target_get = false --记录是否收到标靶坐标
