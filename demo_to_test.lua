@@ -7,7 +7,7 @@ local function create_parameter()
     param:add_param(1,5,"WAYPIONT_CHANGE",0)
 end
 local function target_location() --标靶信息传入模块
-    itargetloc = {-35.3563182,149.1677581,570} --{纬度,经度,海拔}(要确定海拔的参考系,此处使用的是绝对海拔)
+    itargetloc = {-35.3563182,149.1677581,570} --{纬度,经度,绝对海拔}
     return true
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
@@ -30,6 +30,7 @@ end
 local function dropping_calculation() --投弹计算
     local pri_sensor = gps:primary_sensor()
     local loc = gps:location(pri_sensor) --(GPS获取位置与速度信息)
+    loc:origin_alt(true)
     local velocity_vec = gps:velocity(pri_sensor)
     if loc == nil or velocity_vec == nil then
         return false

@@ -8,7 +8,7 @@ local function create_parameter()
 end
 local function target_location() --标靶信息传入模块
     if param:get("TARGET_GET") == 1 then
-        itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG"),param:get("TARGET_ALT")} --{纬度,经度,海拔}(要确定海拔的参考系,此处使用的是绝对海拔)
+        itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG"),param:get("TARGET_ALT")} --{纬度,经度,绝对海拔}
         return true
     else
         return false
@@ -38,6 +38,7 @@ end
 local function dropping_calculation() --投弹计算
     local pri_sensor = gps:primary_sensor()
     local loc = gps:location(pri_sensor) --(GPS获取位置与速度信息)
+    loc:origin_alt(true)
     local velocity_vec = gps:velocity(pri_sensor)
     if loc == nil or velocity_vec == nil then
         return false
