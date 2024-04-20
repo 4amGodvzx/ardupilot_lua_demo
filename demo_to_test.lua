@@ -7,7 +7,7 @@ local function create_parameter()
     param:add_param(1,5,"WAYPIONT_CHANGE",0)
 end
 local function target_location() --标靶信息传入模块
-    itargetloc = {-35.3563182,149.1677581,570} --{纬度,经度,绝对海拔}
+    itargetloc = {22.589920,113.975342,27.3} --{纬度,经度,绝对海拔}
     return true
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
