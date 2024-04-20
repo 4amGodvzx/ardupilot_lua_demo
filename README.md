@@ -27,13 +27,11 @@ ArduPilot提供的API函数接口也在官方文档的首页中。
 `TARGET_LAT = 0.000000`靶标纬度\
 `TARGET_LNG = 0.000000`靶标经度\
 (单位均为度)\
-`TARGET_ALT = 0.00`靶标海拔，单位为米(参考系待定)\
 `TARGET_WAYPOINT_CHANGE = 0`航线未改变为0(默认值)，航线已改变为1\
 投弹完成后，脚本将`TARGET_GET`和`TARGET_WAYPOINT_CHANGE`改回0。
 ## GPS定位问题
-目前测试出的GPS定位误差较大，在10米左右。后续利用GPS的API尝试减小误差。
 ## 靶标信息和航线信息接口
-`target_location()`函数用于获取ArduPilot变量(Parameter)中的，由视觉模块传入的靶标位置数据。数据由(纬度,经度,绝对海拔)构成，期望纬度和经度数据精确到小数点后六位。\
+`target_location()`函数用于获取ArduPilot变量(Parameter)中的，由视觉模块传入的靶标位置数据。数据由(纬度,经度)构成，期望纬度和经度数据精确到小数点后六位。\
 此脚本的计算方法期望飞机在到达靶标前有一段时间可以水平姿态向靶标位置直线飞行，达到这一期望后将信息发送到`wait_for_waypoint_change()`供脚本确认。后期将对投弹算法进行优化，将飞行姿态考虑进来。
 ## Hanversine经纬度换算法
 地球半径使用6371000米。
