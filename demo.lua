@@ -3,12 +3,11 @@ local function create_parameter()
     param:add_param(1,1,"GET",0)
     param:add_param(1,2,"LAT",0)
     param:add_param(1,3,"LNG",0)
-    param:add_param(1,4,"ALT",0)
     param:add_param(1,5,"WAYPIONT_CHANGE",0)
 end
 local function target_location() --标靶信息传入模块
     if param:get("TARGET_GET") == 1 then
-        itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG"),param:get("TARGET_ALT")} --{纬度,经度,绝对海拔}
+        itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG")} --{纬度,经度}
         return true
     else
         return false
@@ -38,13 +37,17 @@ end
 local function dropping_calculation() --投弹计算
     local pri_sensor = gps:primary_sensor()
     local loc = gps:location(pri_sensor) --(GPS获取位置与速度信息)
-    loc:origin_alt(true)
     local velocity_vec = gps:velocity(pri_sensor)
-    if loc == nil or velocity_vec == nil then
+    local loch = ahrs:get_position()
+    if loc == nil or velocity_vec == nil or loch ==nil then
         return false
     end
+    loch:change_alt_frame(1)
     local distance = haversineDistance({x = loc:lat() / 1e7,y = loc:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]})
-    local relative_height = loc:alt() / 100 - itargetloc[3]
+    local relative_height = loch:alt() / 100
+    if relative_height < 0 then
+        return false
+    end
     local velocity = error_correction(velocity_vec:length())
     local displacement
     local g = 9.7997 --河北石家庄重力加速度
@@ -72,7 +75,7 @@ function update()
     end
     if target_location() == true then --判断是否收到标靶坐标
         if target_get == false then
-            gcs:send_text(6,string.format("Recieve target location:%f,%f,%f",itargetloc[1],itargetloc[2],itargetloc[3]))
+            gcs:send_text(6,string.format("Recieve target location:%f,%f,%f",itargetloc[1],itargetloc[2]))
             target_get = true
         end
         if wait_for_waypoint_change() == true then --判断飞机是否直线飞行
