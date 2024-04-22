@@ -1,19 +1,20 @@
 local function create_parameter()
-    param:add_table(1,"TARGET_",10)
-    param:add_param(1,1,"GET",0)
-    param:add_param(1,2,"LAT",0)
-    param:add_param(1,3,"LNG",0)
-    param:add_param(1,5,"WAYPIONT_CHANGE",0)
+    local PARAM_TABLE_KEY = 100
+    assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
+    param:add_param(PARAM_TABLE_KEY,1,"GET",0)
+    param:add_param(PARAM_TABLE_KEY,2,"LAT",0)
+    param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
+    param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT_CHANGE",0)
 end
 local function target_location() --标靶信息传入模块
-    itargetloc = {-35.3563182,149.1677581} --{纬度,经度}
+    itargetloc = {-35.357954,149.167033} --{纬度,经度}
     return true
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
     return true
 end
 local function error_correction(init_velocity) --速度误差修正函数,用于处理飞机速度与水瓶速度的统计关系(待定)
-    return init_velocity - 1
+    return init_velocity
 end
 local function haversineDistance(a, b) --Haversine经纬度换算法
     local earthRadius = 6371000 -- 地球半径
@@ -61,6 +62,10 @@ local waypoint_change = false --记录飞机是否直线飞行
 function update()
     if param:get("TARGET_GET") == nil then
         create_parameter()
+    end
+    if target_get == false then
+        param:set_and_save("TARGET_GET",0)
+        param:set_and_save("WAYPIONT_CHANGE",0)
     end
     if target_location() == true then --判断是否收到标靶坐标
         if target_get == false then
