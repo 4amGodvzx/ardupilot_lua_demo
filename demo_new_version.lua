@@ -6,6 +6,7 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
     param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT_CHANGE",0)
 end
+local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
 local function target_location() --标靶信息传入模块
     if param:get("TARGET_GET") == 1 then
         itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG")} --{纬度,经度}
@@ -57,10 +58,18 @@ local function dropping_calculation() --投弹计算
     local remaining_distance --如果现在投弹,落点与标靶的距离
     remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]})
     gcs:send_text(6,string.format("Remaning distance:%f",remaining_distance))
+    lastdis[1] = lastdis[2]
+    lastdis[2] = lastdis[3]
+    lastdis[3] = remaining_distance
     if math.abs(remaining_distance) < 3 then --投弹决策范围3米
         return true
     else
         return false
+    end
+end
+local function remedy()
+    if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
+        return true
     end
 end
 local function servo_output() --控制舵机函数
@@ -90,8 +99,10 @@ function update()
                 waypoint_change = true
             end
             local time_to_drop = false
+            local remedy_drop = false
             time_to_drop = dropping_calculation()
-            if time_to_drop == true then
+            remedy_drop = remedy()
+            if time_to_drop == true or remedy_drop == true then
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)
