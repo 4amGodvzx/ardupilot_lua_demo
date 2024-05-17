@@ -38,10 +38,10 @@ local function haversineDistance(a, b) --Haversine经纬度换算法
 end
 local function dropping_calculation() --投弹计算
     local pri_sensor = gps:primary_sensor()
-    local loc = gps:location(pri_sensor) --(GPS获取位置与速度信息)
     local velocity_vec = gps:velocity(pri_sensor)
     local loch = ahrs:get_position()
-    if loc == nil or velocity_vec == nil or loch == nil then
+    local locs = ahrs:get_position()
+    if velocity_vec == nil or loch == nil or locs == nil then
         return false
     end
     loch:change_alt_frame(1)
@@ -53,7 +53,6 @@ local function dropping_calculation() --投弹计算
     local time = math.sqrt(2 * relative_height / g)
     local xoff = time * error_correction(velocity_vec:x())
     local yoff = time * error_correction(velocity_vec:y())
-    local locs = gps:location(pri_sensor)
     locs:offset(xoff,yoff)
     local remaining_distance --如果现在投弹,落点与标靶的距离
     remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]})
