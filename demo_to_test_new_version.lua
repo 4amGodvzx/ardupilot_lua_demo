@@ -49,7 +49,7 @@ local function dropping_calculation() --投弹计算
     local remaining_distance --如果现在投弹,落点与标靶的距离
     remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]})
     gcs:send_text(6,string.format("Remaning distance:%f",remaining_distance))
-    if math.abs(remaining_distance) < 3 then --投弹决策范围3米
+    if math.abs(remaining_distance) < 10 then --投弹决策范围10米
         return true
     else
         return false
