@@ -38,7 +38,7 @@ local function dropping_calculation() --投弹计算
     end
     loch:change_alt_frame(1)
     local relative_height = loch:alt() / 100
-    if relative_height < 0 then
+    if relative_height <= 0 or velocity_vec:length() < 0 then
         return false
     end
     local g = 9.7997 --河北石家庄重力加速度
@@ -49,18 +49,10 @@ local function dropping_calculation() --投弹计算
     local remaining_distance --如果现在投弹,落点与标靶的距离
     remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]})
     gcs:send_text(6,string.format("Remaning distance:%f",remaining_distance))
-    lastdis[1] = lastdis[2]
-    lastdis[2] = lastdis[3]
-    lastdis[3] = remaining_distance
     if math.abs(remaining_distance) < 3 then --投弹决策范围3米
         return true
     else
         return false
-    end
-end
-local function remedy()
-    if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
-        return true
     end
 end
 local function servo_output() --控制舵机函数
@@ -91,8 +83,7 @@ function update()
             end
             local time_to_drop = false
             time_to_drop = dropping_calculation()
-            remedy_drop = remedy()
-            if time_to_drop == true or remedy_drop == true then
+            if time_to_drop == true then
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)

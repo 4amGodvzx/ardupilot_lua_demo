@@ -46,7 +46,7 @@ local function dropping_calculation() --投弹计算
     end
     loch:change_alt_frame(1)
     local relative_height = loch:alt() / 100
-    if relative_height < 0 then
+    if relative_height <= 0 or velocity_vec:length() < 0 then
         return false
     end
     local g = 9.7997 --河北石家庄重力加速度
