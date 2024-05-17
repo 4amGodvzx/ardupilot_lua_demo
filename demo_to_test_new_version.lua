@@ -6,9 +6,8 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
     param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT_CHANGE",0)
 end
-local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
 local function target_location() --标靶信息传入模块
-    itargetloc = {-35.3563182,149.1677581} --{纬度,经度}
+    itargetloc = {22.590467,113.975362} --{纬度,经度}
     return true
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
