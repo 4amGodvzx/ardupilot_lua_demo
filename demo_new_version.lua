@@ -7,7 +7,7 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT_CHANGE",0)
 end
 local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
-local function target_location() --标靶信息传入模块
+local function target_location() --标靶信息传入模块(待测试)
     if param:get("TARGET_GET") == 1 then
         itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG")} --{纬度,经度}
         return true
@@ -15,7 +15,7 @@ local function target_location() --标靶信息传入模块
         return false
     end
 end
-local function wait_for_waypoint_change() --等待飞机直线飞行
+local function wait_for_waypoint_change() --等待飞机直线飞行(待测试)
     if param:get("TARGET_WAYPOINT_CHANGE") == 1 then
         return true
     else
@@ -66,14 +66,14 @@ local function dropping_calculation() --投弹计算
         return false
     end
 end
-local function remedy()
+local function remedy() --补救算法(待测试)
     if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
         return true
     end
 end
 local function servo_output() --控制舵机函数
     local servo_output_function = 0
-	SRV_Channels:set_output_pwm(servo_output_function, 2200)
+	SRV_Channels:set_output_pwm(servo_output_function, 800)
 	gcs:send_text(6, "channel5 output.")
     return true
 end
@@ -83,7 +83,7 @@ function update()
     if param:get("TARGET_GET") == nil then
         create_parameter()
     end
-    if target_get == false then
+    if target_get == false then --防御性代码
         param:set_and_save("TARGET_GET",0)
         param:set_and_save("WAYPIONT_CHANGE",0)
     end
