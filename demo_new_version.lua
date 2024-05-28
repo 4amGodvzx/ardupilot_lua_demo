@@ -85,7 +85,7 @@ function update()
     end
     if target_get == false then --防御性代码
         param:set_and_save("TARGET_GET",0)
-        param:set_and_save("WAYPIONT_CHANGE",0)
+        param:set_and_save("TARGET_WAYPIONT_CHANGE",0)
     end
     if target_location() == true then --判断是否收到标靶坐标
         if target_get == false then
@@ -105,7 +105,7 @@ function update()
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)
-                param:set_and_save("WAYPIONT_CHANGE",0)
+                param:set_and_save("TARGET_WAYPIONT_CHANGE",0)
             else
                 return update,500 --计算间隔毫秒数
             end
