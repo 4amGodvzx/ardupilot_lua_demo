@@ -5,6 +5,7 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,2,"LAT",0)
     param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
     param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT_CHANGE",0)
+    param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
 end
 local function target_location() --标靶信息传入模块
     itargetloc = {22.590467,113.975362} --{纬度,经度}
