@@ -4,7 +4,7 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,1,"GET",0)
     param:add_param(PARAM_TABLE_KEY,2,"LAT",0)
     param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
-    param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT_CHANGE",0)
+    param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT",0)
     param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
 end
 local function target_location() --标靶信息传入模块
@@ -16,7 +16,7 @@ local function target_location() --标靶信息传入模块
     end
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
-    if param:get("TARGET_WAYPOINT_CHANGE") == 1 then
+    if param:get("TARGET_WAYPOINT") == 1 then
         return true
     else
         return false
@@ -91,7 +91,7 @@ function update()
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)
-                param:set_and_save("WAYPIONT_CHANGE",0)
+                param:set_and_save("TARGET_WAYPOINT",0)
             else
                 return update,500 --计算间隔毫秒数
             end
