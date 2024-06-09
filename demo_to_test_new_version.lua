@@ -8,11 +8,19 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
 end
 local function target_location() --标靶信息传入模块
-    itargetloc = {22.590467,113.975362} --{纬度,经度}
-    return true
+    if param:get("TARGET_GET") == 1 then
+        itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG")} --{纬度,经度}
+        return true
+    else
+        return false
+    end
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
-    return true
+    if param:get("TARGET_WAYPOINT_CHANGE") == 1 then
+        return true
+    else
+        return false
+    end
 end
 local function error_correction(init_velocity) --速度误差修正函数,用于处理飞机速度与水瓶速度的统计关系(待定)
     return init_velocity
