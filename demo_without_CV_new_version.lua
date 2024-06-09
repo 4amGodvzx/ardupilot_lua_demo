@@ -73,10 +73,6 @@ function update()
     if param:get("TARGET_GET") == nil then
         create_parameter()
     end
-    if target_get == false then
-        param:set_and_save("TARGET_GET",0)
-        param:set_and_save("WAYPIONT_CHANGE",0)
-    end
     if target_location() == true then --判断是否收到标靶坐标
         if target_get == false then
             gcs:send_text(6,string.format("Recieve target location:%f,%f",itargetloc[1],itargetloc[2]))
