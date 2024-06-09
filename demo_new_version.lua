@@ -4,7 +4,7 @@ local function create_parameter() --需要进行检查
     param:add_param(PARAM_TABLE_KEY,1,"GET",0)
     param:add_param(PARAM_TABLE_KEY,2,"LAT",0)
     param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
-    param:add_param(PARAM_TABLE_KEY,5,"WAYPIONT",0)
+    param:add_param(PARAM_TABLE_KEY,5,"WAYPOINT",0)
     param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
 end
 local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
@@ -102,7 +102,7 @@ function update()
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)
-                param:set_and_save("TARGET_WAYPIONT",0)
+                param:set_and_save("TARGET_WAYPOINT",0)
             else
                 return update,500 --计算间隔毫秒数
             end
