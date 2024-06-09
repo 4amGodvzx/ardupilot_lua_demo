@@ -12,9 +12,9 @@
 `TARGET_GET = 0`靶标数据未传入为0(默认值)，数据已传入为1\
 `TARGET_LAT = 0.000000`靶标纬度\
 `TARGET_LNG = 0.000000`靶标经度\
-`TARGET_WAYPOINT_CHANGE = 0`航线未改变为0(默认值)，航线已改变为1\
+`TARGET_WAYPOINT = 0`航线未改变为0(默认值)，航线已改变为1\
 `TARGET_NUM = 0`所选择的航线号码\
-投弹完成后，脚本将`TARGET_GET`和`TARGET_WAYPOINT_CHANGE`改回0。
+投弹完成后，脚本将`TARGET_GET`和`TARGET_WAYPOINT`改回0。
 ## GPS与AHRS定位问题
 飞控的AHRS系统默认引入了EKF滤波算法。\
 在飞控的AHRS相关参数，可以调整AHRS对GPS和陀螺仪、空速管、气压计等设施的采用方案。\
