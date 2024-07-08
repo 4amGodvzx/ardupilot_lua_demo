@@ -129,6 +129,7 @@ local function remedy() --补救算法(待测试)
             gcs:send_text(0,"Dropping failed,try to drop again")
             read_mission("wpr.waypoints")
             remedy_drop = 1
+            param:set_and_save("TARGET_NUM",5)
             lastdis = {10000,10000,10000}
         end
     else
