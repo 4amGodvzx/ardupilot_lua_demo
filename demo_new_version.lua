@@ -1,3 +1,57 @@
+local function read_mission(file_name) --从文件中读取航点
+    -- Open file
+    file = assert(io.open(file_name), 'Could not open :' .. file_name)
+    -- check header
+    assert(string.find(file:read('l'),'QGC WPL 110') == 1, file_name .. ': incorrect format')
+    -- clear any existing mission
+    assert(mission:clear(), 'Could not clear current mission')
+    -- read each line and write to mission
+    local item = mavlink_mission_item_int_t()
+    local index = 0
+    local fail = false
+    while true and not fail do
+       local data = {}
+       local line = file:read()
+       if not line then
+          break
+       end
+       local ret, _, seq, curr, frame, cmd, p1, p2, p3, p4, x, y, z, autocont = string.find(line, "^(%d+)%s+(%d+)%s+(%d+)%s+(%d+)%s+([-.%d]+)%s+([-.%d]+)%s+([-.%d]+)%s+([-.%d]+)%s+([-.%d]+)%s+([-.%d]+)%s+([-.%d]+)%s+(%d+)")
+       if not ret then
+          fail = true
+          break
+       end
+       if tonumber(seq) ~= index then
+          fail = true
+          break
+       end
+       item:seq(tonumber(seq))
+       item:frame(tonumber(frame))
+       item:command(tonumber(cmd))
+       item:param1(tonumber(p1))
+       item:param2(tonumber(p2))
+       item:param3(tonumber(p3))
+       item:param4(tonumber(p4))
+       if mission:cmd_has_location(tonumber(cmd)) then
+          item:x(math.floor(tonumber(x)*10^7))
+          item:y(math.floor(tonumber(y)*10^7))
+       else
+          item:x(math.floor(tonumber(x)))
+          item:y(math.floor(tonumber(y)))
+       end
+       item:z(tonumber(z))
+       if not mission:set_item(index,item) then
+          mission:clear() -- clear part loaded mission
+          fail = true
+          break
+       end
+       index = index + 1
+    end
+    if fail then
+       mission:clear()  --clear anything already loaded
+       error(string.format('failed to load mission at seq num %u', index))
+    end
+    gcs:send_text(0, string.format("Loaded %u mission items", index))
+ end
 local function create_parameter() --需要进行检查
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
@@ -6,8 +60,10 @@ local function create_parameter() --需要进行检查
     param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
     param:add_param(PARAM_TABLE_KEY,5,"WAYPOINT",0)
     param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
+    param:add_param(PARAM_TABLE_KEY,7,"REMEDY",0)
 end
 local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
+local remedy_drop = 0
 local function target_location() --标靶信息传入模块(待测试)
     if param:get("TARGET_GET") == 1 then
         itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG")} --{纬度,经度}
@@ -68,8 +124,31 @@ local function dropping_calculation() --投弹计算
     end
 end
 local function remedy() --补救算法(待测试)
-    if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
-        return true
+    if remedy_drop == 0 then
+        if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
+            gcs:send_text(0,"Dropping failed,try to drop again")
+            read_mission("wpr.waypoints")
+            remedy_drop = 1
+            lastdis = {10000,10000,10000}
+        end
+    else
+        if param:get("TARGET_REMEDY") == 1 then
+            if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
+                gcs:send_text(0,"Remedy dropping failed,drop now")
+                remedy_drop = 2
+            else
+                local time_to_remedy_drop = false
+                time_to_remedy_drop = dropping_calculation()
+                if time_to_remedy_drop == true then
+                    servo_output() --控制舵机执行投弹操作
+                    gcs:send_text(6,"Remedy dropping complete!")
+                    param:set_and_save("TARGET_GET",0)
+                    param:set_and_save("TARGET_WAYPOINT",0)
+                else
+                    return update,500 --计算间隔毫秒数
+                end
+            end
+        end
     end
 end
 local function servo_output() --控制舵机函数
@@ -95,10 +174,11 @@ function update()
                 waypoint_change = true
             end
             local time_to_drop = false
-            local remedy_drop = false
-            time_to_drop = dropping_calculation()
-            remedy_drop = remedy()
-            if time_to_drop == true or remedy_drop == true then
+            if remedy_drop == 0 then
+                time_to_drop = dropping_calculation()
+            end
+            remedy()
+            if time_to_drop == true or remedy_drop == 2 then
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)
