@@ -66,7 +66,7 @@ local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
 local remedy_drop = 0
 local function target_location() --标靶信息传入模块(待测试)
     if param:get("TARGET_GET") == 1 then
-        itargetloc = {param:get("TARGET_LAT"),param:get("TARGET_LNG")} --{纬度,经度}
+        itargetloc = {param:get("TARGET_LAT")/1e7,param:get("TARGET_LNG")/1e7} --{纬度,经度}
         return true
     else
         return false
