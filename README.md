@@ -13,7 +13,7 @@
 `TARGET_GET = 0`靶标数据未传入为0(默认值)，数据已传入为1\
 `TARGET_LAT = 0.000000`靶标纬度\
 `TARGET_LNG = 0.000000`靶标经度\
-`TARGET_WAYPOINT = 0`未到最后航点为0(默认值)，已到最后航点为1\
+`TARGET_WAYPOINT = 0`未到最后航点为0(默认值)，已到最后航点为1，进入补救航线为2\
 `TARGET_NUM = 0`所选择的航线号码\
 `TARGET_REMEDY = 0`到达补救航线航线最后航点为1\
 投弹完成后，脚本将`TARGET_GET`和`TARGET_WAYPOINT`改回0。
