@@ -8,6 +8,7 @@
 `mission_choose_load.lua`用于航点文件加载
 # 与飞控的对接情况
 ## 飞控与脚本的通话步骤
+0.将航线文件上传到飞控的主目录\
 1.收到视觉提供的靶标坐标后，将坐标传入`TARGET_LAT`和`TARGET_LNG`\
 2.将`TARGET_NUM`改为航线文件的号码\
 3.将`TARGET_GET`改为1\
