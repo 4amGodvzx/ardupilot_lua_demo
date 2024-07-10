@@ -8,8 +8,12 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
 end
 local function target_location() --标靶信息传入模块
-    itargetloc = {22.590431,113.975327} --{纬度,经度}
-    return true
+    if param:get("TARGET_GET") == 1 then
+        itargetloc = {param:get("TARGET_LAT")/1e7,param:get("TARGET_LNG")/1e7} --{纬度,经度}
+        return true
+    else
+        return false
+    end
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
     if param:get("TARGET_WAYPOINT") == 1 then
@@ -52,6 +56,7 @@ local function dropping_calculation() --投弹计算
     locs:offset(xoff,yoff)
     local remaining_distance --如果现在投弹,落点与标靶的距离
     remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]})
+    rd_output = remaining_distance
     gcs:send_text(6,string.format("Remaning distance:%f",remaining_distance))
     if math.abs(remaining_distance) < 10 then --投弹决策范围10米
         return true
@@ -86,6 +91,11 @@ function update()
             if time_to_drop == true then
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
+                local file = io.open("testlog.txt","a")
+                local pri_sensor = gps:primary_sensor()
+                local vec = gps:velocity(pri_sensor)
+                file:write(string.format("Groundspeed:%.4f,Remaning distance:%f\n"),vec,rd_output)
+                file:close()
                 param:set_and_save("TARGET_GET",0)
                 param:set_and_save("TARGET_WAYPOINT",0)
             else
