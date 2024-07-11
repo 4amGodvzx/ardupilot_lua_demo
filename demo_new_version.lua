@@ -146,7 +146,7 @@ local function remedy() --补救算法(待测试)
                     param:set_and_save("TARGET_GET",0)
                     param:set_and_save("TARGET_WAYPOINT",0)
                 else
-                    return update,500 --计算间隔毫秒数
+                    return update,100 --计算间隔毫秒数
                 end
             end
         end
@@ -185,7 +185,7 @@ function update()
                 param:set_and_save("TARGET_GET",0)
                 param:set_and_save("TARGET_WAYPOINT",0)
             else
-                return update,500 --计算间隔毫秒数
+                return update,100 --计算间隔毫秒数
             end
         else
             gcs:send_text(6,"Wait for waypoint change")
