@@ -8,12 +8,8 @@ local function create_parameter()
     param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
 end
 local function target_location() --标靶信息传入模块
-    if param:get("TARGET_GET") == 1 then
-        itargetloc = {22.590431,113.975327} --{纬度,经度}
-        return true
-    else
-        return false
-    end
+    itargetloc = {22.590431,113.975327} --{纬度,经度}
+    return true
 end
 local function wait_for_waypoint_change() --等待飞机直线飞行
     if param:get("TARGET_WAYPOINT") == 1 then
