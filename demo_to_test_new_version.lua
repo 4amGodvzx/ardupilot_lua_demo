@@ -9,7 +9,7 @@ local function create_parameter()
 end
 local function target_location() --标靶信息传入模块
     if param:get("TARGET_GET") == 1 then
-        itargetloc = {param:get("TARGET_LAT")/1e7,param:get("TARGET_LNG")/1e7} --{纬度,经度}
+        itargetloc = {22.590431,113.975327} --{纬度,经度}
         return true
     else
         return false
