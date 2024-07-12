@@ -154,7 +154,7 @@ local function remedy() --补救算法(待测试)
 end
 local function servo_output() --控制舵机函数
     local servo_output_function = 0
-	SRV_Channels:set_output_pwm(servo_output_function, 800)
+	SRV_Channels:set_output_pwm(servo_output_function, 2200)
 	gcs:send_text(6, "channel5 output.")
     return true
 end
