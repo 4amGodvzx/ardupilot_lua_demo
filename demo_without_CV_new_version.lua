@@ -70,6 +70,7 @@ end
 local target_get = false --记录是否收到标靶坐标
 local waypoint_change = false --记录飞机是否直线飞行
 function update()
+    local start_time = millis()
     if param:get("TARGET_GET") == nil then
         create_parameter()
     end
@@ -89,6 +90,9 @@ function update()
             if time_to_drop == true or remedy_drop == true then
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
+                local end_time = millis()
+                local execution_time = end_time - start_time
+                gcs:send_text(6, "Execution time: " .. tostring(execution_time) .. " ms")
                 param:set_and_save("TARGET_GET",0)
                 param:set_and_save("TARGET_WAYPOINT",0)
             else
