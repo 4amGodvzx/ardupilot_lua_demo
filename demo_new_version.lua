@@ -106,7 +106,7 @@ local function dropping_calculation() --投弹计算
     if relative_height <= 0 or velocity_vec:length() < 2 then
         return false
     end
-    local g = 9.7997 --河北石家庄重力加速度
+    local g = 9.7913 --成都重力加速度
     local a = g - 3.6 * 1.3 * g * relative_height / 1400
     local time = math.sqrt(2 * relative_height / a)
     local xoff = time * vec_correction(velocity_vec:length(),time) * velocity_vec:x() / velocity_vec:length()
