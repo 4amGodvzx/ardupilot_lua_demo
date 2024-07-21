@@ -80,7 +80,7 @@ local function wait_for_waypoint_change() --等待飞机直线飞行
     end
 end
 local function vec_correction(init_velocity,t_in) --速度误差修正函数,用于处理飞机速度与水瓶速度的统计关系(待定)
-    return init_velocity - 4.8 * 1.3 * init_velocity * init_velocity * t_in / 700
+    return init_velocity - 3.6 * 1.3 * init_velocity * init_velocity * t_in / 700
 end
 local function haversineDistance(a, b) --Haversine经纬度换算法
     local earthRadius = 6371000 -- 地球半径
@@ -107,13 +107,13 @@ local function dropping_calculation() --投弹计算
         return false
     end
     local g = 9.7997 --河北石家庄重力加速度
-    local a = g - 4.8 * 1.3 * g * relative_height / 1400
+    local a = g - 3.6 * 1.3 * g * relative_height / 1400
     local time = math.sqrt(2 * relative_height / a)
     local xoff = time * vec_correction(velocity_vec:length(),time) * velocity_vec:x() / velocity_vec:length()
     local yoff = time * vec_correction(velocity_vec:length(),time) * velocity_vec:y() / velocity_vec:length()
     locs:offset(xoff,yoff)
     local remaining_distance --如果现在投弹,落点与标靶的距离
-    remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]}) + velocity_vec:length() * 0.05 / 2
+    remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]}) + velocity_vec:length() * (0.05 / 2 + 0.15)
     gcs:send_text(6,string.format("Remaning distance:%f",remaining_distance))
     lastdis[1] = lastdis[2]
     lastdis[2] = lastdis[3]
