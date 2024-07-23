@@ -167,7 +167,7 @@ function update()
     end
     if target_location() == true then --判断是否收到标靶坐标
         if target_get == false then
-            gcs:send_text(6,string.format("Recieve target location:%f,%f,%f",itargetloc[1],itargetloc[2]))
+            gcs:send_text(6,string.format("Recieve target location:%.6f,%.6f",itargetloc[1],itargetloc[2]))
             target_get = true
         end
         if wait_for_waypoint_change() == true then --判断飞机是否直线飞行
