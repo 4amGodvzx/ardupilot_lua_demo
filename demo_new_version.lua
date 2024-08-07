@@ -2,8 +2,6 @@ local function create_parameter() --需要进行检查
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
     param:add_param(PARAM_TABLE_KEY,1,"GET",0)
-    param:add_param(PARAM_TABLE_KEY,2,"LAT",0)
-    param:add_param(PARAM_TABLE_KEY,3,"LNG",0)
     param:add_param(PARAM_TABLE_KEY,5,"WAYPOINT",0)
     param:add_param(PARAM_TABLE_KEY,6,"NUM",0)
     param:add_param(PARAM_TABLE_KEY,7,"REMEDY",0)
