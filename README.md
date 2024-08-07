@@ -1,27 +1,22 @@
 # LUA文件
 `demo_without_CV_new_version.lua`文件用于在视觉模块还没接入时在SITL上模拟使用的脚本，在代码文件的第10行的`itargetloc = {}`内存储了靶标的坐标，模拟时可以修改。\
 `demo_to_test_new_version.lua`是用于投弹实测的脚本文件。\
-`demo_new_version.lua`是完整版的脚本文件，还在修改中。\
-`output.lua`用于位置数据输出。\
+`demo_new_version.lua`是完整版的脚本文件。\
 `mission_choose_load.lua`用于航点文件加载
 # 误差分析
 ## 见文件投弹误差分析
 # 与飞控的对接情况
-## 两次控制权交接和remedy航线需要重新设计
 ## 飞控与脚本的通话步骤
 0.将航线文件上传到飞控的主目录\
 1.将`TARGET_NUM`改为航线文件的号码\
 2.将`TARGET_GET`改为1\
 后续由脚本进行控制，变量的详细信息见下
-## 在ArduPilot中创建靶标数据相关的变量
+## 在ArduPilot中创建相关的变量
 注意：每次测试前都要重置变量\
-`create_parameter()`函数用于在ArduPilot中创建接受靶标数据的变量：\
-`TARGET_GET = 0`靶标数据未传入为0(默认值)，数据已传入为1\
-`TARGET_LAT = 0.0`靶标纬度\
-`TARGET_LNG = 0.0`靶标经度(注意：经度纬度坐标传入原数据X10^7，避免小数被吞掉)\
+`TARGET_GET = 0`靶标数据未获得为0(默认值)，数据已获得为1\
 `TARGET_WAYPOINT = 0`未到最后航点为0(默认值)，已到最后航点为1\
-`TARGET_NUM = 0`所选择的航线号码,当进入补救航线时值为5\
-`TARGET_REMEDY = 0`到达补救航线航线最后航点为1\
+`TARGET_NUM = 0`所选择的航线号码\
+`TARGET_REMEDY = 0`首次投弹时值为0，首次投弹失败值为1，第二次投弹失败值为2\
 投弹完成后，脚本将`TARGET_GET`和`TARGET_WAYPOINT`改回0。
 ## GPS与AHRS定位问题
 飞控的AHRS系统默认引入了EKF滤波算法。\
