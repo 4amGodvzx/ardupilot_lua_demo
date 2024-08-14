@@ -8,7 +8,7 @@ local function create_parameter() --需要进行检查
 end
 local function servo_output() --控制舵机函数
     local servo_output_function = 0
-	SRV_Channels:set_output_pwm(servo_output_function, 2200)
+	SRV_Channels:set_output_pwm(servo_output_function, 1000)
 	gcs:send_text(6, "channel5 output.")
     return true
 end
