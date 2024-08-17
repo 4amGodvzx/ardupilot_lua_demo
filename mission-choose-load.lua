@@ -56,13 +56,13 @@ function update()
    if param:get("TARGET_GET") == 1 then
       if param:get("TARGET_NUM") == 1 then
          read_mission('wp1.waypoints')
-         vehicle:set_mode(10)
+         param:set_and_save("TARGET_AUTO",1)
       elseif param:get("TARGET_NUM") == 2 then
          read_mission('wp2.waypoints')
-         vehicle:set_mode(10)
+         param:set_and_save("TARGET_AUTO",1)
       elseif param:get("TARGET_NUM") == 3 then
          read_mission('wp3.waypoints')
-         vehicle:set_mode(10)
+         param:set_and_save("TARGET_AUTO",1)
       end
    else
       return update,1000

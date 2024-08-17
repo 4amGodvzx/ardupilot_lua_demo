@@ -81,50 +81,6 @@ local function dropping_calculation() --投弹计算
         return false
     end
 end
-local function remedy() --补救算法(待测试)
-    if remedy_drop == 0 then
-        if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
-            gcs:send_text(0,"Begin Remedy Drop 1st")
-            remedy_drop = 1
-            param:set_and_save("TARGET_REMEDY",1)
-            param:set_and_save("TARGET_WAYPOINT",0)
-            lastdis = {10000,10000,10000}
-        end
-    elseif remedy_drop == 1 then
-        if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
-            gcs:send_text(0,"Begin Remedy Drop 2nd")
-            remedy_drop = 2
-            param:set_and_save("TARGET_REMEDY",2)
-            param:set_and_save("TARGET_WAYPOINT",0)
-            lastdis = {10000,10000,10000}
-        else
-            if param:get("TARGET_WAYPOINT") == 1 then
-                local time_to_remedy_drop1 = false
-                time_to_remedy_drop1 = dropping_calculation()
-                if time_to_remedy_drop1 == true then
-                    remedy_drop = 3
-                else
-                    return update,50 --计算间隔毫秒数
-                end
-            end
-        end
-    elseif remedy_drop == 2 then
-        if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] then
-            gcs:send_text(0,"Final Drop")
-            remedy_drop = 3
-        else
-            if param:get("TARGET_WAYPOINT") == 1 then
-                local time_to_remedy_drop2 = false
-                time_to_remedy_drop2 = dropping_calculation()
-                if time_to_remedy_drop2 == true then
-                    remedy_drop = 3
-                else
-                    return update,50 --计算间隔毫秒数
-                end
-            end
-        end
-    end
-end
 local target_get = false --记录是否收到标靶坐标
 local waypoint_change = false --记录飞机是否直线飞行
 function update()
@@ -145,7 +101,6 @@ function update()
             if remedy_drop == 0 then
                 time_to_drop = dropping_calculation()
             end
-            remedy()
             if time_to_drop == true or remedy_drop == 3 then
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
