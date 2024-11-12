@@ -1,4 +1,6 @@
-local function create_parameter() --需要进行检查
+--这是投弹代码的核心，用延时法计算投弹，也是最后比赛时选择的方法
+--同一个飞控上传了四个脚本，脚本之间独立运行，利用ardupilot变量进行信息交互
+local function create_parameter() --创建与投弹相关的ardupilot变量，各变量作用见new_version分支的README
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
     param:add_param(PARAM_TABLE_KEY,1,"GET",0)
@@ -7,15 +9,15 @@ local function create_parameter() --需要进行检查
     param:add_param(PARAM_TABLE_KEY,7,"REMEDY",0)
     param:add_param(PARAM_TABLE_KEY,8,"AUTO",0)
 end
-local function servo_output() --控制舵机函数
+local function servo_output() --控制舵机输出
     local servo_output_function = 0
-	SRV_Channels:set_output_pwm(servo_output_function, 1900)
+	SRV_Channels:set_output_pwm(servo_output_function, 1900) --控制function为0的pwm输出为1900(舵机处于投弹状态)，舵机的function值在ardupilot变量里设置
 	gcs:send_text(6, "channel5 output.")
     return true
 end
-local delay = 0
+local delay = 0 --延迟计数器
 local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
-local remedy_drop = 0
+local remedy_drop = 0 --控制变量的
 local function remedy()
     if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] and remain_out <= 20 then
         remedy_drop = 3
