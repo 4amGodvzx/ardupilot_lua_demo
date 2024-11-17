@@ -17,9 +17,9 @@ local function servo_output() --控制舵机输出
 end
 local delay = 0 --延迟计数器
 local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
-local remedy_drop = 0 --控制变量的
-local function remedy()
-    if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] and remain_out <= 20 then
+local remedy_drop = 0 --紧急投弹标识，变量为3执行紧急投弹
+local function remedy() --紧急投弹
+    if lastdis[1] < lastdis[2] and lastdis[2] < lastdis[3] and remain_out <= 20 then --当飞机已经距离靶标不足20米，且最近三个距离越来越远，开始紧急投弹
         remedy_drop = 3
         gcs:send_text(0,"Remedy Drop")
     end
@@ -39,14 +39,14 @@ local function target_location() --标靶信息传入模块
         return false
     end
 end
-local function wait_for_waypoint_change() --等待飞机直线飞行
+local function wait_for_waypoint_change() --等待飞机从盘旋状态改出
     if param:get("TARGET_WAYPOINT") == 1 then
         return true
     else
         return false
     end
 end
-local function vec_correction(init_velocity,t_in) --速度误差修正函数,用于处理飞机速度与水瓶速度的统计关系(待定)
+local function vec_correction(init_velocity,t_in) --速度误差修正
     return init_velocity - 1.6 * 1.3 * init_velocity * init_velocity * t_in / 700
 end
 local function haversineDistance(a, b) --Haversine经纬度换算法
@@ -63,11 +63,11 @@ end
 local function dropping_calculation() --投弹计算
     local velocity_vec = ahrs:groundspeed_vector()
     local loch = ahrs:get_position()
-    local locs = ahrs:get_position()
-    if velocity_vec == nil or loch == nil or locs == nil then
+    local locs = ahrs:get_position() --调用飞控API的代码
+    if velocity_vec == nil or loch == nil or locs == nil then --防御性代码，从飞控调用的很多数据很容易出现nil值使程序出错
         return false
     end
-    loch:change_alt_frame(1)
+    loch:change_alt_frame(1) --将高度数据改为相对高度
     local relative_height = loch:alt() / 100
     if relative_height <= 0 or velocity_vec:length() < 2 then
         return false
@@ -80,12 +80,12 @@ local function dropping_calculation() --投弹计算
     locs:offset(xoff,yoff)
     local remaining_distance --如果现在投弹,落点与标靶的距离
     remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]}) + velocity_vec:length() * (0.05 / 2 + 0.15)
-    remain_out = remaining_distance
+    remain_out = remaining_distance --将当前距离复制一份到global
     gcs:send_text(6,string.format("Remaning distance:%f",remaining_distance))
     lastdis[1] = lastdis[2]
     lastdis[2] = lastdis[3]
-    lastdis[3] = remaining_distance
-    if delay >= 1 then
+    lastdis[3] = remaining_distance --记录最近的距离数据
+    if delay >= 1 then --延迟投弹，当距离10m时倒计时4*50ms后投弹
         if delay >= 4 then
             gcs:send_text(0,"delay finished!")
             return true
@@ -95,7 +95,7 @@ local function dropping_calculation() --投弹计算
             return false
         end
     end
-    if math.abs(remaining_distance) < 10 then --投弹决策
+    if math.abs(remaining_distance) < 10 then --延迟开始距离
         delay = 1
         return false
     else
@@ -110,7 +110,7 @@ function update()
     end
     if target_location() == true then --判断是否收到标靶坐标
         if target_get == false then
-            gcs:send_text(6,string.format("Recieve target location:%.6f,%.6f",itargetloc[1],itargetloc[2]))
+            gcs:send_text(6,string.format("Recieve target location:%.6f,%.6f",itargetloc[1],itargetloc[2])) --用ardupilot变量交换信息
             target_get = true
         end
         if wait_for_waypoint_change() == true then --判断飞机是否直线飞行
@@ -120,15 +120,15 @@ function update()
             end
             local time_to_drop = false
             if remedy_drop == 0 then
-                time_to_drop = dropping_calculation()
+                time_to_drop = dropping_calculation() --调用投弹计算函数
             end
             remedy()
-            if time_to_drop == true or remedy_drop == 3 then
+            if time_to_drop == true or remedy_drop == 3 then --当投弹计算函数输出为true或进入紧急投弹时执行投弹
                 servo_output() --控制舵机执行投弹操作
                 gcs:send_text(6,"Dropping complete!")
                 param:set_and_save("TARGET_GET",0)
                 param:set_and_save("TARGET_WAYPOINT",0)
-                param:set_and_save("TARGET_AUTO",0)
+                param:set_and_save("TARGET_AUTO",0) --变量重置
             else
                 return update,50 --计算间隔毫秒数
             end
