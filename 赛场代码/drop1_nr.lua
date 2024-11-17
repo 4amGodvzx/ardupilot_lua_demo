@@ -1,4 +1,5 @@
-local function create_parameter() --需要进行检查
+--此代码是没有使用延迟计数的代码版本
+local function create_parameter()
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
     param:add_param(PARAM_TABLE_KEY,1,"GET",0)
