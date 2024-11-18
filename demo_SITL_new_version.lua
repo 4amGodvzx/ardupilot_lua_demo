@@ -1,4 +1,4 @@
---这个代码文件用于在SITL虚拟环境下模拟投弹程序，版本比较旧
+--这个代码文件用于在SITL虚拟环境下模拟投弹程序，版本比较旧，没有延迟计数，紧急投弹程序不完善
 local function create_parameter()
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
