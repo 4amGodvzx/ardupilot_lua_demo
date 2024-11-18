@@ -1,3 +1,4 @@
+--这个代码文件用于在SITL虚拟环境下模拟投弹程序，版本比较旧
 local function create_parameter()
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
@@ -15,7 +16,7 @@ end
 local function wait_for_waypoint_change() --等待飞机直线飞行
     return true
 end
-local function vec_correction(init_velocity,t_in) --速度误差修正函数,用于处理飞机速度与水瓶速度的统计关系(待定)
+local function vec_correction(init_velocity,t_in) --速度误差修正函数,用于处理飞机速度与水瓶速度的统计关系
     return init_velocity - 4.8 * 1.3 * init_velocity * init_velocity / 700
 end
 local function haversineDistance(a, b) --Haversine经纬度换算法
