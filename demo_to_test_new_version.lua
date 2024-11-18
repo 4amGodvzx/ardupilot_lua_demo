@@ -1,3 +1,4 @@
+--用于对投弹的单一模块测试，去除了与ROS的通讯部分，与代码文件way_detect_test.lua一起使用
 local function create_parameter()
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
