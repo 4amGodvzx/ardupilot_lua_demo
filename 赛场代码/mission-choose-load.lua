@@ -1,6 +1,7 @@
-local function read_mission(file_name) --从文件中读取航点
+--此代码文件用于将飞控内储存的航点文件上传
+local function read_mission(file_name) --从文件中读取航点(此函数来源:https://github.com/ArduPilot/ardupilot/blob/master/libraries/AP_Scripting/examples/mission-load.lua)
    -- Open file
-   file = assert(io.open(file_name), 'Could not open :' .. file_name)
+   file = assert(io.open(file_name), 'Could not open :' .. file_name) --打开飞控APM目录内文件名为file_name的文件
    -- check header
    assert(string.find(file:read('l'),'QGC WPL 110') == 1, file_name .. ': incorrect format')
    -- clear any existing mission
@@ -52,14 +53,14 @@ local function read_mission(file_name) --从文件中读取航点
    end
    gcs:send_text(0, string.format("Loaded %u mission items", index))
 end
-local function param_set()
+local function param_set() --与ROS通讯，在上传完航点后让飞机准备切出
    repeat
       param:set_and_save("TARGET_AUTO",1)
    until param:get("TARGET_AUTO") == 1
 end
 function update()
-   if param:get("TARGET_GET") == 1 then
-      if vehicle:get_mode() == 11 then
+   if param:get("TARGET_GET") == 1 then --确认飞机收到靶标数据
+      if vehicle:get_mode() == 11 then --确认飞机处于盘旋模式(飞行模式对应的参数在ardupilot参数内给出)
          if param:get("TARGET_NUM") == 1 then
             read_mission('way1.txt')
             param_set()
