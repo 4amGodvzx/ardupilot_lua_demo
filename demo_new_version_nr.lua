@@ -1,4 +1,5 @@
-local function create_parameter() --需要进行检查
+--没有延迟计数和紧急投弹的代码版本
+local function create_parameter()
     local PARAM_TABLE_KEY = 100
     assert(param:add_table(PARAM_TABLE_KEY,"TARGET_",10),"Unable to add params!")
     param:add_param(PARAM_TABLE_KEY,1,"GET",0)
@@ -15,7 +16,7 @@ local function servo_output() --控制舵机函数
 end
 local lastdis = {10000,10000,10000} --记录飞机最近三个距离数据
 local remedy_drop = 0
-local function target_location() --标靶信息传入模块(待测试)
+local function target_location() --标靶信息传入模块
     if param:get("TARGET_GET") == 1 then
         local target_num = param:get("TARGET_NUM")
         if target_num == 1 then
