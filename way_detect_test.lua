@@ -1,3 +1,4 @@
+--用于投弹的单一模块测试
 function update()
     local index = mission:get_current_nav_index()
     if index ~= nil then
