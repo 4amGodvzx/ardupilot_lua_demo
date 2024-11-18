@@ -46,7 +46,7 @@ local function wait_for_waypoint_change() --等待飞机从盘旋状态改出
         return false
     end
 end
-local function vec_correction(init_velocity,t_in) --速度误差修正
+local function vec_correction(init_velocity,t_in) --速度修正
     return init_velocity - 1.6 * 1.3 * init_velocity * init_velocity * t_in / 700
 end
 local function haversineDistance(a, b) --Haversine经纬度换算法
@@ -69,17 +69,17 @@ local function dropping_calculation() --投弹计算
     end
     loch:change_alt_frame(1) --将高度数据改为相对高度
     local relative_height = loch:alt() / 100
-    if relative_height <= 0 or velocity_vec:length() < 2 then
+    if relative_height <= 0 or velocity_vec:length() < 2 then --防御性代码，防止飞机在地面上接近或小于0的高度、速度数据使程序报错
         return false
     end
     local g = 9.7913 --成都重力加速度
-    local a = g - 1.6 * 1.3 * g * relative_height / 1400
-    local time = math.sqrt(2 * relative_height / a)
+    local a = g - 1.6 * 1.3 * g * relative_height / 1400 --近似下落加速度
+    local time = math.sqrt(2 * relative_height / a) --投弹的近似数学模型
     local xoff = time * vec_correction(velocity_vec:length(),time) * velocity_vec:x() / velocity_vec:length()
     local yoff = time * vec_correction(velocity_vec:length(),time) * velocity_vec:y() / velocity_vec:length()
     locs:offset(xoff,yoff)
     local remaining_distance --如果现在投弹,落点与标靶的距离
-    remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]}) + velocity_vec:length() * (0.05 / 2 + 0.15)
+    remaining_distance = haversineDistance({x = locs:lat() / 1e7,y = locs:lng() / 1e7},{x = itargetloc[1],y = itargetloc[2]}) + velocity_vec:length() * (0.05 / 2 + 0.15) --距离修正
     remain_out = remaining_distance --将当前距离复制一份到global
     gcs:send_text(6,string.format("Remaning distance:%f",remaining_distance))
     lastdis[1] = lastdis[2]
