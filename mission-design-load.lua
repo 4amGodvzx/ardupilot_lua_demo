@@ -1,3 +1,4 @@
+--这个代码原来是准备做自动设计航线的功能，但没有完成
 local function control_exchange() --收到靶标后的动作
    return true
 end
